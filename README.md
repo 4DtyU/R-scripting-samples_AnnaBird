@@ -2,5 +2,5 @@
 Example of R analysis of FACS data ( non-proprietary source data )
 
 INSTRUCTIONS FOR USE:
-Download all 3 files
-Run the .Rmd file
+(1) Download all 3 files
+(2) Run the .Rmd file
