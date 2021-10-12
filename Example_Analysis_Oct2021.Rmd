@@ -343,7 +343,6 @@ p.loadings <- pca_comps %>%
 - Goal: Assess the capacity of drug stimuli A, B, C, & D to induce maturation, as measured by FACS immunophenotyping
 
 
-
 <br><br>
 
 
@@ -353,13 +352,16 @@ p.loadings <- pca_comps %>%
 
 - Antigen B indicates immature cell status
 
+
 <br><br>
 
 #### Goal 2: Determine how drug combinations affect the essential cell functions performed by Antigens C - I
 
 - Antigens C - I are functional markers associated with effector function of mature Cell Type X in healthy individuals. 
 
+
 <br><br>
+
 
 #### Experimental Setup
 ##### 1) Isolated immature cell type X from patients with disase and treated cells w/ drug stims A - D for 48 hrs @37degreesC
@@ -378,6 +380,7 @@ p.pca
 
 <br><br>
 
+
 #### The PCA plot (PC1 x PC2) above suggests a possible differentiation path of Cell Type X.
 This hypothesis can be confirmed by asking which treatment group expresses the highest level of Antigen A (maturation marker)?
 
@@ -387,7 +390,9 @@ p.antigenA + p.antigenB
 ##### Conclusions:
  - The principal components (PC1xPC2) dot plot above shows a differentiation path. The bar chart above shows that Stim C & D yields the most immature state of Cell Type X, & Stims B & C showing the greatest degree of maturation of Cell Type X
 
+
 <br><br>
+
 
 #### Does drug-induced maturation generate full effector function?
 #### Which cell functional markers may be defective with drug-induced maturation?
@@ -396,7 +401,9 @@ p.antigenA + p.antigenB
 - Several antigens indicate fully developed effector function, including Antigens C, D, G, I, & J
 - Which functional markers (Antigens C-I) are most strongly associated with drug-induced maturation? 
 
+
 <br><br>
+
 
 #### Plotting the PCA loadings to determine which functional antigens are most strongly associated with maturation path seen in PC1 & PC2.
 
@@ -410,12 +417,14 @@ p.loadings
 
 <br><br>
 
+
 ##### Note:
  - Drug effects on functional markers can be confirmed in more detail by looking at supplementary exported data: 
  "antigen responses to drug treatments.pdf"
  - For example, Antigen J expression patterns are similar to previously defined maturation marker B. Antigen F does not track well with maturation. 
 
 <br><br>
+
 
 ### In summary, the analysis finds that therapeutic treatment with drugs B & C can induce partial maturation of Cell Type X
 - 48 hour treatment with drug stims B & C showed the strongest induction of classic markers of maturation (eg Antigen A). 
