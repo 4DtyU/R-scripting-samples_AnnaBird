@@ -1,107 +1,62 @@
 ---
 title: "Example Analysis"
-output: html_notebook
 author: Anna Bird
-date: 10.04.21
+date: 12.02.21
+output: 
+  html_document:
+    keep_md: true
+    df_print: paged
+    theme: bootstrap
 ---
-
-
-
-### Purpose of the script: demonstrate coding skills using *in silico*-generated (non-proprietary) flow cytometry data
 
 <br><br>
 
-#### How to use this script
+##### Purpose of the script: demonstrate coding skills using *in silico*-generated (non-proprietary) flow cytometry data
+
+##### How to use this script
 1) run the script Ctrl+Alt+R
 2) Click "Preview" button above to see HTML Analysis Report
 
 ##### Script Inputs 
 - "example FACS data.xlsx" This includes raw data & metadata for the FACS experiment
 
+
 ##### Script Outputs
 - Report output from this .Rmd ________________Primary Analysis (cf "How to use this script")
 - "antigen responses to drug treatments.pdf" __________ Supplementary exported plots
 - "120901 FACSstats CleanedMerged.xlsx" __________ exported tidied data set
 
-
+<br><br>
 <br><br>
 
-### Assessing the efficacy of several compounds to improve the maturation & function of Cell Type X
+### Title:     Assessing the efficacy of several drug compounds to improve the maturation & function of Cell Type X
 
 
 <br><br>
 
 ```{r adjust settings & load libraries, include = FALSE}
 
-knitr::opts_chunk$set(
-  tidy = TRUE,
-  tidy.opts = list(width.cutoff = 120),
-  message = FALSE,
-  warning = FALSE,
-  error = FALSE,
-  echo = FALSE,
-  collapse = TRUE
+packages = c("ape", "colormap", "data.table", "datasets", "devtools", "extrafont", "extrafontdb", "ggforce", "ggplot2", "ggpointdensity", "ggrepel", "grid","gridExtra", "gtable", "hms", "knitr", "lattice", "lubridate", "Matrix", "memisc", "MASS", "patchwork", "plyr", "RColorBrewer","readxl", "recipes", "remotes", "rlang", "scales", "stringr", "stringi", "tidyr", "tidyselect", "tidyverse", "tidymodels","viridis", "glue", "stringi", "memisc", "writexl", "vroom")
+
+# Load packs OR install&load packs
+package.check <- lapply(
+  packages,
+  FUN = function(x) {
+    if (!require(x, character.only = TRUE)) {
+      install.packages(x, dependencies = TRUE)
+      library(x, character.only = TRUE)
+    }
+  }
 )
 
-library(ape)
-library(colormap)
-library(data.table)
-library(datasets)
-library(devtools)
-library(extrafont)
-library(extrafontdb)
-library(ggforce)
-library(ggplot2)
-require(ggpointdensity)
-library(ggrepel)
-library(grid)
-library(gridExtra)
-library(gtable)
-library(hms)
-library(knitr)
-library(lattice)
-library(lubridate)
-library(Matrix)
-library(memisc)
-library(MASS)
-library(patchwork)
-library(plyr)
-library(RColorBrewer)
-library(readxl)
-library(recipes)
-library(remotes)
-library(rlang)
-library(scales)
-library(stringr)
-library(stringi)
-library(tidyr)
-library(tidyselect)
-library(tidyverse)
-library(tidymodels)
-library(viridis)
-library(writexl)
-library(vroom)
-library(glue)
-library(tidymodels)
-library(viridis)
-
-extrafont::loadfonts(device="pdf")
-extrafont::loadfonts(device="postscript")
 theme_set(theme_bw(base_family = "Helvetica"))
 theme_update(strip.background = element_rect(color="white", fill="#FFFFFF", size=0), 
           strip.text = element_text(colour = 'black', size = 12, face = "bold", hjust = 0),
           plot.tag = element_text(color = "ivory", hjust = 1, size = 8))
 
-allDuplicated <- function(vec){
-  front <- duplicated(vec)
-  back <- duplicated(vec, fromLast = TRUE)
-  all_dup <- front + back > 0
-  return(all_dup)
-}
+toGreek <- function(x) {
 
-toGreek <- function(x) {    #use library(stringi) ... 
-
-   x <- gsub("alpha", "\u03b1", x)              # English to unicode
+   x <- gsub("alpha", "\u03b1", x)              # Greek conversion
    x <- gsub("beta", "\u03b2", x)
    x <- gsub("gamma", "\u03b3", x)
    #x <- gsub("delta", "\u03b4", x)
@@ -114,7 +69,7 @@ toGreek <- function(x) {    #use library(stringi) ...
 
 toGreekLiteral <- function(x) {   
 
-   x <- gsub("ug/mL", "μg/mL", x) 
+   x <- gsub("ug/mL", "μg/mL", x)               # Greek conversion
    x <- gsub("alpha", "α", x)            
    x <- gsub("beta", "β", x)
    x <- gsub("gamma", "γ", x)
@@ -125,6 +80,16 @@ toGreekLiteral <- function(x) {
    x <- gsub("uL", "μL", x)
    x <- gsub("uM", "μM", x)
 }
+
+knitr::opts_chunk$set(
+  tidy = TRUE,
+  tidy.opts = list(width.cutoff = 120),
+  message = FALSE,
+  warning = FALSE,
+  error = FALSE,
+  echo = FALSE,
+  collapse = TRUE
+)
 
 ```
 
@@ -194,8 +159,6 @@ D.p <- D.l %>%
 ```{r more munging: remove white space & add greek letters}
 
 #  Clean-up: trim white space & convert greek letters (eg uM to µM)
-library(memisc)
-library(dplyr)
 
 D.p <- D.p %>% mutate(dplyr::across(where(is.character), trimws))                     # Remove white space
 names(D.p) <- map_chr(names(D.p), ~ trimws(.x)) 
@@ -334,7 +297,7 @@ p.loadings <- pca_comps %>%
 ```
 
 
-#### Experimental Question:  How does treatment with drugs A-D affect differentiation of Cell Type X?
+### Experimental Question:  How does treatment with drugs A-D affect differentiation of Cell Type X?
 
 - In healthy human peripheral blood, antigens A & B indicate mature & immature forms of Cell Type X, respectively
 
@@ -346,7 +309,7 @@ p.loadings <- pca_comps %>%
 <br><br>
 
 
-#### Goal 1: Assess which functional markers appear with drug-induced maturation of cell type X
+### Goal 1: Assess which functional markers appear with drug-induced maturation of cell type X
 
 - Antigen A indicates advanced maturation of Cell Type X
 
@@ -355,26 +318,26 @@ p.loadings <- pca_comps %>%
 
 <br><br>
 
-#### Goal 2: Determine how drug combinations affect the essential cell functions performed by Antigens C - I
+### Goal 2: Determine how drug combinations affect the essential cell functions performed by Antigens C thru I
 
-- Antigens C - I are functional markers associated with effector function of mature Cell Type X in healthy individuals. 
+- Antigens C thru I are functional markers associated with effector function of mature Cell Type X in healthy individuals. 
+
+
+<br><br>
+
+
+### Experimental Setup
+##### 1) Isolated immature Cell Type X from patients with disase and treated cells w/ drug stims A - D for 48 hrs @37degreesC
+##### 2) Stained cells with antibodies against Antigens A thru I
+##### 3) Ran flow cytometry to visualize the phenotypic relationships of Cell Type X treatment groups. 
 
 
 <br><br>
 
 
-#### Experimental Setup
-##### 1) Isolated immature cell type X from patients with disase and treated cells w/ drug stims A - D for 48 hrs @37degreesC
-##### 2) Stained cells with antibodies against Antigens A - I
-##### 3) Ran flow cytometry to visualize the phenotypic relationships of multiple cell type X treatment groups. 
-
-
-<br><br>
-
-#### Analysis Results
+### Analysis Results
 
 ```{r, fig.align = 'center', fig.width = 8}
-library(knitr)
 p.pca
 ```
 
@@ -387,19 +350,21 @@ This hypothesis can be confirmed by asking which treatment group expresses the h
 ```{r, fig.align = 'center', fig.width = 8}
 p.antigenA + p.antigenB
 ```
-##### Conclusions:
+
+
+#### Conclusions:
  - The principal components (PC1xPC2) dot plot above shows a differentiation path. The bar chart above shows that Stim C & D yields the most immature state of Cell Type X, & Stims B & C showing the greatest degree of maturation of Cell Type X
 
 
 <br><br>
-
+<br><br>
 
 #### Does drug-induced maturation generate full effector function?
 #### Which cell functional markers may be defective with drug-induced maturation?
 
 - The differentiation path of Cell Type X is most clearly observable in PC1 & PC2. 
 - Several antigens indicate fully developed effector function, including Antigens C, D, G, I, & J
-- Which functional markers (Antigens C-I) are most strongly associated with drug-induced maturation? 
+- Which functional markers (Antigens C thru I) are most strongly associated with drug-induced maturation? 
 
 
 <br><br>
@@ -428,10 +393,11 @@ p.loadings
 
 ### In summary, the analysis finds that therapeutic treatment with drugs B & C can induce partial maturation of Cell Type X
 - 48 hour treatment with drug stims B & C showed the strongest induction of classic markers of maturation (eg Antigen A). 
-- Cell Type X treated with drugs B & C show some, but not all functional markers typically associated with maturation (Antigens C - I).  
+- Cell Type X treated with drugs B & C show some, but not all functional markers typically associated with maturation (Antigens C thru I).  
 
 
-
+<br><br>
+<br><br>
 
 
 
