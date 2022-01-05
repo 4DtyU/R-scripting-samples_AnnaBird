@@ -50,6 +50,6 @@
 <font color="3300CC"> INSTRUCTIONS FOR USE:</font>
 <p>     Step 1) Download all files (click the green "Code" button above; download .zip folder)
 <p>     Step 2) Extract the zip folder contents
-<p>     Step 3) Input a local directory where you want the GDC files saved (you will need GDC client installed).
+<p>     Step 3) Optional: Input a local directory where you want the GDC files saved (default download uses be "api" method. Files total 156MB).
 <p>     Step 4) Run the .Rmd file using 'knit' OR just look at the included .nb file to view analysis. 
 </pre>
