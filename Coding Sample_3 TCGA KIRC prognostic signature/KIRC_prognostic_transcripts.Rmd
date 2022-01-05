@@ -1,0 +1,808 @@
+---
+title: "Derivation of a prognostic signature for renal carcinoma"
+output:
+  html_document:
+    df_print: paged
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: false
+    code_folding: show
+    theme: bootstrap
+fontsize: 10
+editor_options:
+  markdown:
+    wrap: 72
+author: Anna Bird
+---
+
+### SCRIPT OVERVIEW
+
+
+The goal of this analysis is to derive a transcriptomic signature that
+predicts disease outcome for Renal Carcinoma patients. Voom/Limma is
+used here to derive abnormally expressed genes in a comparison of tumor
+vs. normal associated tissue (NAT). A survival model then elucidates
+which abnormally expressed DEG predict patient outcome, using a combined
+outcome metric (patient survival or days to last follow-up'). The
+resulting prognostic signature includes a list of genes with well-known
+associations to tumor progression, including TGFbeta & Wnt signaling
+pathways.
+
+<br><br>
+
+### INSTRUCTIONS
+
+1\) Make sure GDC client is installed on your machine --
+<https://gdc.cancer.gov/access-data/gdc-data-transfer-tool>
+
+2\) OPTIONAL: Input a file path for your downloaded transcriptomic data in the first code chunk below. Total downloaded data are 156MB. 
+
+3\) Run this script (click "Knit" above) (takes \~10min to run on my laptop)
+
+<br><br>
+
+
+### ANALYSIS OUTLINE
+
+<br><br>
+
+Analysis Stage 1 - Assess data structure and design Limma model
+
+
+
+A\) SET UP QUERY for human Kidney Renal Clear Cell Carcinoma (KIRC)
+transcriptomic data from the GDC (TCGA) database, generated using both
+tumor samples and normal associated tissue (NAT)
+[\<https://portal.gdc.cancer.gov/projects/TCGA-KIRC>](https://portal.gdc.cancer.gov/projects/TCGA-KIRC){.uri}
+
+B\) CLINICAL METADATA PROFILED to look for any confounders that need to
+be corrected for in the final limma model design. For example, tumor and
+NAT samples showed differences in their tumor stage profile, meaning
+tumor stage needed to be corrected for as a source of transcriptomic
+variation.
+
+C\) VOOM NEEDED? - Calculate library size variance (e.g. determine
+whether to use VOOM). This is done by first setting up a preliminary
+design matrix, normalizing the data, and ploting the library
+distributions & normalization correction factors.
+
+<br><br>
+
+Analysis Stage 2 - Determine which genes show abnormal expression in cancer & of these, which predict survival?
+
+
+
+D\) RE-RUN QUERY with a filtered samples list (some samples with small
+lib size were removed)
+
+E\) LIMMA/VOOM were used to obtain DEG (NAT vs. tumor)
+
+F\) TUMOR STRATIFICATION NEEDED? - Correlation heat mapping and PCA were
+used to visualize the number of major sample populations & and assess
+whether tumor sample stratification might be appropriate (no clear basis
+for stratification was observed).
+
+G\) SURVIVAL MODEL - Top abnormally expressed genes (DEG from NAT vs.
+tumor), were used to determine which genes would predict survival,
+yielding a prognostic gene signature
+
+
+<br><br>
+
+
+OPTIONAL: Input your own file path for data download. GDC KIRC transcriptomic counts will be directed to this folder:
+
+```{r}
+target_directory <- file.path(getwd(), "GDCdata")   
+```
+
+Once the directory above has been set, run all code: (click "Knit" above ). You may need to install BioC packages if you don't already have them. 
+
+```{r, message=FALSE, warning= FALSE}
+packages <- unique(c("ape", "chroma","colormap","corrplot","cowplot","data.table","datasets","devtools","downloader","Ecdat","embed","epiR","esquisse","extrafont","extrafontdb","factoextra","FactoMineR","flexdashboard","gapminder","ggforce","ggfortify","ggplot2","ggpointdensity","ggpubr","ggrepel","ggsci","ggvis","ggh4x","gmodels","grid","gridBase","gridExtra","gtable","gtools","GGally","heatmaply","hflights","Hmisc","here","hms","jcolors","knitr","kableExtra","Lahman","lattice","lsr","lubridate","Matrix","mlbench","MASS","nycflights13","patchwork","pheatmap","plyr","pzfx","rafalib","RColorBrewer","readxl","remotes","reshape","reshape2","rio","rsvd","scales","sciplot","Seurat","shiny","stringr","stringi","skimr","tidyr","tidyselect","tidyverse","tm","ursa","VennDiagram","viridis","writexl","here","RColorBrewer","repurrrsive","ggridges","ggthemes","tm","SnowballC","wordcloud","e1071","vroom","tidylog","janitor","lubridate","glue","tsibble","tidytext","tidymodels","rstatix","ggplotify","dr4pl","tidyverse","sandwich","lmtest","drc","tidymodels","grid","gridExtra","lattice","parsnip","aod","ggpubr","knitr","patchwork","rlang","rstatix","elisar","ursa","hrbrthemes","ggstatsplot","RPostgreSQL","scclusteval","xlsx","TCGAbiolinks","limma","edgeR","glmnet","factoextra","FactoMineR","caret","SummarizedExperiment","gplots","survival","survminer","RColorBrewer","gProfileR","genefilter", "TCGAbiolinks", "GenomicDataCommons", "CGPfunctions"))
+
+# BiocManager::install("BioinformaticsFMRP/TCGAbiolinks")     # For bioC packages
+# BiocManager::install("GenomicDataCommons")
+
+package.check <- lapply(
+  packages,
+  FUN = function(x) {
+    if (!require(x, character.only = TRUE)) {
+      install.packages(x, dependencies = TRUE)
+      library(x, character.only = TRUE)
+    }
+  }
+) 
+
+theme_set(theme_bw(base_family = "Helvetica"))
+theme_update(strip.background = element_rect(color="white", fill="#FFFFFF", size=0), 
+          strip.text = element_text(colour = 'black', size = 12, face = "bold", hjust = 0),
+          plot.tag = element_text(color = "ivory", hjust = 1, size = 8))
+
+knitr::opts_chunk$set(error = FALSE, message = FALSE, warning = FALSE)
+```
+
+
+<br><br>
+
+
+### Analysis Stage 1 - Assess data structure and design Limma model
+
+
+<br><br>
+
+
+#### A) SET UP QUERY
+
+```{r}
+query = GDCquery(
+  project = "TCGA-KIRC",
+  data.category = "Transcriptome Profiling", 
+  experimental.strategy = "RNA-Seq",
+  workflow.type = "HTSeq - Counts",
+  sample.type = c("Primary Tumor", "Solid Tissue Normal"),  # tumor and NAT
+  access = "open",
+  legacy = FALSE)
+
+GenomicDataCommons::status()
+
+GDCdownload(query,
+  method = "api",  
+  directory = target_directory)
+
+kirc_res = getResults(query)
+
+kirc_res$is_ffpe %>% unique()                      # are ffpe samples present?
+```
+
+
+```{r, message = FALSE}
+# Prepare expression series matrix from downloaded files
+KIRC_data <- GDCprepare(query, directory = target_directory)
+```
+
+Take a look \@ the series matrix
+
+```{r}
+KIRCMatrix <- assay(KIRC_data)
+KIRCMatrix[1:10, 1:10]
+```
+
+
+<br><br>
+
+
+#### B) CLINICAL METADATA PROFILED
+
+Info on GDC metadata:
+<https://docs.gdc.cancer.gov/Data_Dictionary/viewer/#?view=table-definition-view&id=demographic&anchor=age_at_index>
+
+Looking for potential confounders in the metadata, e.g. is the tumor
+variable "longest_dimension" (size) greater in NAT samples compared to
+tumor samples? Would such a difference in tumor growth need to be
+corrected for in the upcoming diff. expr. analysis between NAT vs tumor?
+
+-- Plotting continuous variables --
+
+```{r}
+
+contin_vars <- c("longest_dimension", "age_at_diagnosis", "age_at_index")
+
+CV_plot <- function(VAR) {
+
+  WT <- tidy(wilcox.test(KIRC_data@colData[[VAR]] ~ definition, KIRC_data@colData))
+  WT_p <- WT$p.value
+  WT_test <- "wilcoxon"
+
+  df <- KIRC_data@colData %>%
+    as_tibble()
+
+  ggplot(df, aes_string(x = VAR, y = factor(df$"definition"),
+                group = "definition",
+                fill = "definition")) +
+  geom_density_ridges(jittered_points = TRUE,
+                position = "raincloud",
+                alpha = 0.4,
+                color = "black") +
+    scale_fill_npg() +
+    labs(y = NULL, title = paste(VAR), subtitle = paste("p_val =", round(WT_p, 3), WT_test))
+  }
+
+map(contin_vars, ~ CV_plot(.x))
+
+```
+
+Assessment: age_at_index, age_at_diagnosis, and tumor size (longest_dimension) are not signficantly different between primary sold tumor and solid tissue normal (NAT). 
+
+
+<br><br>
+
+
+Looking for potential confounders in the metadata
+
+-- Plotting discrete variables --
+
+```{r, fig.width = 6, fig.height = 4}
+discrete_vars <- c("is_ffpe",
+                         "gender",
+                         "ajcc_pathologic_stage",
+                         "prior_treatment",
+                         "race",
+                   "prior_malignancy")
+
+prop_viewer <- function(VAR) {
+  PlotXTabs2(
+    data = as_tibble(KIRC_data@colData),
+    y = VAR,
+    x = definition,
+    bf.details = TRUE,
+    xlab = "Tissue type",
+    ylab = NULL,
+    data.label = "counts",
+    label.fill.alpha = .3,
+    legend.position = "left",
+    title = paste(VAR, "by tissue"),
+    palette = "Set1"
+  )   }
+
+map(discrete_vars, ~ prop_viewer(.x))
+```
+
+<br><br>
+
+Assessment: ajcc_pathologic_stage is signficantly different between tumor & NAT, and should be corrected for in the final limma model. Gender will also be corrected for, due to male-female genetic distance. 
+
+<br><br>
+
+Create preliminary design matrix comparing sample groups "Solid Tissue Normal" to "Primary solid Tumor"
+
+```{r}
+targets <- KIRC_data@colData %>% as_tibble %>%
+  mutate(ajcc_pathologic_stage = case_when(          # make cancer stage data a continuous & quantitative variable
+    ajcc_pathologic_stage == "Stage I" ~ 1,
+    ajcc_pathologic_stage == "Stage II" ~ 2,
+    ajcc_pathologic_stage == "Stage III" ~ 3,
+    ajcc_pathologic_stage == "Stage IV" ~ 4,
+    TRUE ~ 2
+))  
+
+group <- "definition"
+comparison_groups <- KIRC_data@colData$definition %>% unique                 # set comparison groups
+design_factor = colData(KIRC_data)[, group, drop=T]                          # choose design factor
+design_factor <- factor(
+    x = design_factor,
+    levels=c("Solid Tissue Normal", "Primary solid Tumor")                   # Set first item here is the reference
+)
+
+design <- model.matrix(~ design_factor + gender + ajcc_pathologic_stage, targets)
+
+```
+
+Create DGEList object (S4) that contains counts, norm counts and lib sizes
+
+```{r, }
+dge = DGEList(counts=assay(KIRC_data),  
+              samples=colData(KIRC_data),
+              genes=as.data.frame(rowData(KIRC_data)))
+```
+
+Remove low expressed genes
+
+```{r}
+keep <- filterByExpr(dge, design)       # output is a gene list
+dge <- dge[keep,,keep.lib.sizes=FALSE]
+dge %>% str(., max.level = 3)
+```
+
+
+<br><br>
+
+
+#### C) VOOM NEEDED?
+
+Plot library sizes, normalization factors, and distributions to look for
+any data abnormalities (ie samples w/ poor sequencing or biological
+coverage)
+
+Decide whether or not VOOM us necessary here (VOOM useful were lib size
+variance is high) by plotting library sizes
+
+```{r, fig.width = 10, fig.height = 4}
+
+lib_size_cut = 2.7*10^7   # size cutoff used to filter samples for a subsequent query below
+
+(p.ls <- dge[[2]] %>%
+  as_tibble(rownames = "library") %>%
+  ggplot(., aes(fct_reorder(library, lib.size), lib.size)) +
+  geom_bar(stat = "identity", fun = "mean", aes(fill = definition), alpha = 0.8, show.legend = TRUE) +
+  labs(title = "Library Sizes - w/ filter line", x = "Library (indexed by size)") +
+  theme_classic() +
+  scale_fill_viridis_d() +
+    geom_hline(yintercept = lib_size_cut, linetype = "dashed", size = 2, color = "midnightblue")
+  )
+
+larger_libraries <- dge[[2]] %>%     # list of barcodes for larger libs
+  dplyr::filter(lib.size > lib_size_cut) %>% 
+  rownames()
+```
+
+Scale normalization of the RNAseq read counts using TMM (trimmed mean of
+M component) normalization method.
+
+```{r, }
+dge <- calcNormFactors(dge)
+```
+
+Plot library normalization factors
+
+```{r}
+(p.norm <- dge[[2]] %>%
+  as_tibble(rownames = "library") %>%
+  ggplot(., aes(fct_reorder(library, norm.factors), norm.factors)) +
+  geom_bar(stat = "identity", fun = "mean", aes(fill = ifelse(library %in% larger_libraries, "large", "small")), show.legend = TRUE) +
+  labs(title = "Library Normalization Factors", x = NULL,
+       subtitle = paste("max / min of normalization factors:", round(max(dge[[2]]$norm.factors)/min(dge[[2]]$norm.factors) , 3), "fold" ),
+       fill = "Library size - defined as the \n\"larger_libraries\" list above") +
+  theme_classic() +
+  theme(#axis.text.x = element_text(angle = 45, hjust = 1)
+     #axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+     legend.position = "top") +
+   scale_fill_aaas())
+```
+
+Plot library expression distributions
+
+```{r, fig.width = 12}
+(p.ld <- dge[[1]] %>%
+  as_tibble(rownames = "geneID") %>%
+  pivot_longer(-geneID,
+               names_to = "library",
+               values_to = "expression") %>%
+  ggplot(., aes(`library`, log(`expression`, 10))) +
+  geom_boxplot(outlier.colour="black",
+               outlier.shape=16,
+               outlier.size=2,
+               notch=TRUE,
+               aes(fill = library), show.legend = FALSE) +
+  labs(title = "Library Distribution",
+       x = NULL,
+       subtitle = paste("max / min of lib.size",
+                        round(max(dge[[2]]$lib.size)/min(dge[[2]]$lib.size), 3), "fold" )) +
+  theme(#axis.text.x = element_text(angle = 45, hjust = 1)
+        axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()
+       ))
+```
+
+
+<br><br>
+
+------------------------------------------------------------------------
+
+<br><br>
+
+
+### Analysis Stage 2 - Re-do GDC query, preparation, & normalization using a new filtered sample list (samples with larger library sizes). Then set up a survival model to find genes the predict survival.
+
+So far...
+
+A GDC query and download was done to visualize the metadata and plan the
+design matrix. The library sizes and normalization factors were plotted
+to find outliers and list excluding very small libraries was created.
+Metadata was also visualized to identify potential confounders that
+should be corrected for in the final voom/limma model below.
+
+Next...
+
+The query will be set up again, this time with specific barcodes (ie
+samples) that have been selected on the basis of having a larger library
+size. Design matrix and normalization factors are computed again to
+ensure compatibility with the new query.
+
+
+<br><br>
+
+
+#### D) RE-RUN QUERY
+
+```{r, message = FALSE}
+
+larger_libraries %>% length   # list of barcodes used to select larger libraries
+
+query_filtered = GDCquery(
+  project = "TCGA-KIRC",
+  data.category = "Transcriptome Profiling", # parameter enforced by GDCquery
+  experimental.strategy = "RNA-Seq",
+  workflow.type = "HTSeq - Counts",
+  sample.type = c("Primary Tumor", "Solid Tissue Normal"),
+  access = "open",
+  legacy = FALSE, 
+  barcode = larger_libraries                       # the filter "larger_librararies" is now added in an otherwise identical query
+  )
+
+# Re_create expression matrix
+KIRC_data <- GDCprepare(query_filtered,
+                        directory = target_directory)
+
+clinical <- KIRC_data@colData %>% as_tibble %>%
+  mutate(ajcc_pathologic_stage = case_when(          # make cancer stage data a continuous & quantitative variable
+    ajcc_pathologic_stage == "Stage I" ~ 1,
+    ajcc_pathologic_stage == "Stage II" ~ 2,
+    ajcc_pathologic_stage == "Stage III" ~ 3,
+    ajcc_pathologic_stage == "Stage IV" ~ 4,
+    TRUE ~ 2
+))  
+
+group <- "definition"
+comparison_groups <- KIRC_data@colData[[group]] %>% unique                   # set comparison groups
+design_factor = colData(KIRC_data)[, group, drop=T]                          # choose design factor
+design_factor <- factor(
+    x = design_factor,
+    levels=c("Solid Tissue Normal", "Primary solid Tumor")                   # Set first item here is the reference
+)
+
+design <- model.matrix(~ design_factor + gender + ajcc_pathologic_stage, clinical)
+
+dge = DGEList(counts=assay(KIRC_data),  # CREATE S4 OBJECT
+              samples=colData(KIRC_data),
+              genes=as.data.frame(rowData(KIRC_data)))
+
+keep <- filterByExpr(dge, design)       # output is a gene list
+
+dge <- dge[keep,,keep.lib.sizes=FALSE]  # REMOVE LOW EXPRESSED GENES
+
+dge <- calcNormFactors(dge)             # NORMALIZE
+
+dge$counts %>% dim
+```
+
+
+<br><br>
+
+
+#### E) LIMMA/VOOM
+
+Voom does a transformation & differential expression calculation. VOOM
+was chosen over limma-trend because the library sizes are variable
+between samples (>3-fold differences). The VOOM transformation is
+applied to the normalized & filtered DGEList object 'dge'.
+
+In the voom plot below, each point is one gene, with x axis showing the
+avg expression in log2 cpm reads and y axis is the square-root of the
+residual stdev of expression in log2 counts per million reads.
+
+Voom transformation uses the experiment design matrix, and produces an
+EList (S4) object
+
+```{r}
+voomObj <- voom(dge, design, plot=TRUE)
+```
+
+After VOOM, the usual LIMMA pipelines can be run, starting w fitting a
+model:
+
+```{r}
+fit <- lmFit(voomObj, design) #fit a linear model to the array
+fit <- eBayes(fit) # ebays adds to the linear model. Given a linear model fit, eBayes computes moderated t stats, moderated f-stat, and log-odds of differential expression by empirical Bayes moderation of the standard errors toward a common value. 
+
+```
+
+Extract top features after meta analysis
+
+```{r}
+top_gene_count = 2000  # nrow(fit)     # look at all fitted genes or just put in a number here
+
+top_table <- topTable(fit, coef=ncol(design), adjust.method = "bonf", n = top_gene_count)
+
+p.top_table <- top_table %>% 
+  as_tibble(rownames = "gene_names") %>%
+  ggplot(., aes(logFC, -log(adj.P.Val, 10))) +
+  geom_point(alpha = 0.6, color = "blue") +
+  geom_text_repel(aes(label = external_gene_name)) +
+  labs(title = "VOOM with top table",
+        subtitle = paste("n = ", top_gene_count),
+        x = "Log2FC (KIRC tumor / NAT)")
+```
+
+Or, to give more weight to fold changes in the ranking, one could say
+
+```{r, fig.width = 9, fig.height = 4}
+fit <- treat(fit, lfc=log2(1.05))
+
+top_treat <- topTreat(fit, coef=ncol(design), n = top_gene_count)
+
+p.top_treat <- top_treat %>% 
+  as_tibble(rownames = "gene_names") %>%
+  ggplot(., aes(logFC, -log(adj.P.Val,10))) +
+    geom_point(color = "blue", alpha = 0.6) +
+    geom_text_repel(aes(label = external_gene_name)) +
+    labs(title = "VOOM using topTreat() \nto find top DEG",
+        subtitle = paste("n = ", top_gene_count),
+        x = "Log2FC (KIRC tumor / NAT)")
+
+top_table %>% mutate(sig = ifelse(adj.P.Val < 0.1, "signif.", "non-signif.")) %>% .$sig %>% table
+top_treat %>% mutate(sig = ifelse(adj.P.Val < 0.1, "signif.", "non-signif.")) %>% .$sig %>% table
+
+p.top_table + p.top_treat & 
+  plot_annotation(title = "Find top DEG (tumor vs NAT) with either topTable() or treat() to weight fold changes") &
+  geom_point(aes(color = -log(adj.P.Val,10))) &
+  scale_color_viridis_c(option = "D", direction = -1) &
+  geom_hline(yintercept = 10^0.1, size = 1, color = "red", linetype = "dashed")
+
+#The function treat() tests if the absolute log fold change is greater than the indicated value (log2(1.2)), rather than 0. 
+```
+
+Save VOOM object w/ model and metadata
+
+```{r}
+limma_res <- list(
+      voomObj=voomObj, # normalized data
+      fit=fit, # fitted model and statistics
+      topGenes=top_table # the most differentially expressed genes
+    )
+
+## Look at components of voom object
+# limma_res$voomObj[[1]] %>% head(., 5)            # gene name conversion
+# limma_res$voomObj[[2]] %>% head(., 5)             # metadata
+# limma_res$voomObj[[3]] %>% head(., 5)             # series matrix
+
+```
+
+
+<br><br>
+
+
+#### F) TUMOR STRATIFICATION NEEDED?
+
+PCA plot voom obj function
+
+Although there are clearly two populations (NAT and tumor, tumor is not
+clearly amenable to stratification -- ie there is one, albeit
+phenotypically diverse tumor population)
+
+```{r, fig.width = 10, fig.height = 4}
+plot_PCA_gg = function(vObj, condition_variable, pcs = c(1,2)){
+  group = factor(vObj$targets[, condition_variable])
+  pca = prcomp(t(vObj$E))
+
+  pca_plot <- ggplot(pca$x, aes(pca$x[,pcs[1]], pca$x[,pcs[2]])) +
+         geom_point(aes(color = group), alpha = 0.6, size = 2) +
+    labs(x = paste0("PC", pcs[1]),
+         y = paste0("PC", pcs[2]),
+         subtitle = "Prin. Comp. Analysis", title = "Population distance") +
+    scale_color_aaas()
+  pca_plot
+}
+
+p.12 <- plot_PCA_gg(limma_res$voomObj, "definition", pcs = c(1,2))
+p.34 <- plot_PCA_gg(limma_res$voomObj, "definition", pcs = c(3,4))
+
+p.12 + p.34 & labs(color = "Tumor vs NAT")
+```
+
+Function to create scree plot
+
+```{r}
+
+plot_scree <- function(scaled_matrix) {
+
+  pca <- prcomp(t(scaled_matrix))
+  pca_stats <- stats:::summary.prcomp(pca)$importance[2, ]
+
+  pca_stats %>%
+    as.matrix %>%
+    t() %>%
+    as_tibble() %>%
+    pivot_longer(everything()) %>%
+    .[1:10,] %>%    # only the first 10 prin. comps
+    ggplot(., aes(x = fct_reorder(name, -value), y = value, label = value)) +
+    geom_bar(alpha = 0.6, stat = "identity", fun = "mean", fill = "midnightblue") +
+    scale_y_percent() +
+    labs(x = NULL, y = "Fraction of variance", title = "Scree plot - first 10 PCs") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+}
+
+plot_scree(limma_res$voomObj$E)
+
+```
+
+Use a Spearman correlation heat map of the VOOM-normalized series matrix
+to look at the prevalence of outliers and the number of tumor sample
+populations. If multiple, clearly-distinct tumor populations are
+present, sample stratification may be needed (i.e. comparing NAT to each
+stratified tumor population).
+
+```{r, fig.height = 8, fig.width = 8}
+VO <- voomObj[[3]]
+
+annotation_row = data.frame(df_Group = factor(voomObj[[2]]$definition, ordered = TRUE))   # make row annotation
+rownames(annotation_row) = voomObj[[2]]$barcode
+
+cormat <- cor(VO, method = c("spearman"))   # correlation of all samples against each other
+set.seed(123)
+pheatmap(cormat, 
+         show_rownames = FALSE, 
+         show_colnames = FALSE, 
+         annotation_row = annotation_row,
+         annotation_colors = list( df_Group = c("Primary solid Tumor"="black", "Solid Tissue Normal"="hotpink3")),
+         fontsize=14,
+         main = "Correlation heat map of VOOM series matrix\nLooking for outliers & major populations"
+         )
+
+levels(annotation_row$df_Group)
+```
+
+Visualize frequency distribution of significant genes in top DEG (tumor
+vs NAT)
+
+```{r}
+expr_df = limma_res$topGenes
+
+expr_df %>% ggplot(., aes(x = adj.P.Val)) +
+  geom_histogram() +
+  labs(title = "p val dist in top_genes")
+```
+
+Visualize top DEG (tumor vs NAT)
+
+```{r, fig.width = 10, fig.height = 8}
+meta_data <- limma_res$voomObj$targets
+
+top_20_DEG <- top_treat %>% 
+  arrange(`adj.P.Val`) %>% 
+  head(., 20) %>% 
+  dplyr::select(ensembl_gene_id) %>% deframe
+
+gene_vln <- function(gene) {
+  gene_of_interest <- gene
+  ext_gene_name <- limma_res$voomObj[[1]][gene_of_interest, "external_gene_name"]
+  
+  gene_meta <- t(limma_res$voomObj$E) %>%
+    as_tibble(rownames = "barcode") %>%
+    .[, c("barcode", gene_of_interest)] %>%
+    left_join(., meta_data, by = "barcode")
+  
+  gene_meta %>% ggplot(., aes(definition, .data[[gene_of_interest]])) +
+  geom_violin(aes(fill = definition), alpha = 0.5, show.legend = FALSE) +
+  labs(y = ext_gene_name, x = NULL) +
+  scale_fill_aaas()
+}
+
+map(top_20_DEG, ~ gene_vln(.x)) %>% marrangeGrob(., ncol = 4, nrow = 5)
+```
+
+
+<br><br>
+
+
+#### G) SURVIVAL MODEL
+
+Find the abnormally expressed genes (from the tumor vs NAT comparison)
+that also predict overall survival (a combined metric created from
+"days_to_last_follow_up" & "days_to_death")
+
+```{r}
+clin_df <- meta_data %>%
+  as_tibble() %>%
+  dplyr::filter(definition == "Primary solid Tumor") %>%
+  dplyr::select("barcode", "patient", "vital_status", "days_to_death", "days_to_last_follow_up", "gender", "ajcc_pathologic_stage") %>%
+  mutate(deceased = ifelse(vital_status == "Dead", TRUE, FALSE))
+
+clin_df$overall_survival = ifelse(clin_df$deceased,
+                                  clin_df$days_to_death,
+                                  clin_df$days_to_last_follow_up)
+
+d_mat <- varFilter(limma_res$voomObj$E, var.func=IQR, var.cutoff=0.95) %>% t()  # gives list of genes with high dispersion (top 5%)
+
+# divide patients in two groups, up and down regulated.
+# if the patient expression is greater or equal to them median we put it
+
+pred_surv_pval <- function(x) {
+  gene_id <- x
+  median_value <- median(d_mat[,gene_id])
+  
+  d_meta_gene <- d_mat[,gene_id] %>% 
+    as_tibble(rownames = "barcode") %>% 
+    rename(., c("value" = "gene_value")) %>%
+    inner_join(., clin_df, by = "barcode") %>%
+    mutate(gene = ifelse(gene_value <= median_value, "DOWN", "UP"))
+  
+  # fit a survival model
+  fit <- survfit(Surv(overall_survival, deceased) ~ gene, data=d_meta_gene)
+  
+  # extract the survival p-value
+  pval = surv_pvalue(fit, data=d_meta_gene, method = "S1")$pval
+  pval
+}
+
+surv_pvals <- map_dfr(colnames(d_mat), 
+                      ~ tibble(pval = pred_surv_pval(.x), 
+                               ENSG = paste(.x))) %>% 
+  mutate(FDR = p.adjust(pval, method = "BH")) %>%
+  mutate(signif = ifelse(FDR <= 0.1, "signif", "non-signif"))
+
+signif_pred_genes <- surv_pvals %>%
+  dplyr::filter(signif == "signif") %>%  # FDR 10%
+  dplyr::select(ENSG) %>%
+  deframe
+```
+
+Refine the gene list above. Above, a gene list was identified that
+significantly predicted (in terms of pval) survival. However, pvalues
+have limited utility as sample numbers increase, so this list is refined
+below include samples with high fold changes (cutoff was 2\^0.3219281 =
+1.25 fold change; ie 25% change).
+
+```{r, message = FALSE}
+fold_change <- function(x) {
+d_meta_gene <- d_mat[, x] %>% 
+    as_tibble(rownames = "barcode") %>% 
+    inner_join(., clin_df, by = "barcode") %>%
+    mutate(gene = ifelse(value <= median(value), "DOWN", "UP")) # stratify samples based on gene expression (above or below that gene's median expression)
+
+two_average <- function(x) { log( x[1]/x[2], 2) }
+two_average(c(2,4))
+
+F2C <- d_meta_gene %>%
+  group_by(gene) %>% 
+  summarize(average = mean(overall_survival)) %>%
+  dplyr::select(average) %>%
+  deframe() %>% 
+  two_average() 
+F2C
+}
+  
+fold_change(signif_pred_genes[1])
+
+df_fc <- map_dfr(signif_pred_genes, ~ tibble(FC_log2 = fold_change(.x),
+                                    ENSG = paste(.x)))
+
+genes_signif_hiFC <- df_fc %>% dplyr::filter(FC_log2 > 0.3219281) %>% dplyr::select(ENSG) %>% deframe
+
+```
+
+Plot the resulting gene list to look at each transcript's prognostic
+value toward survival
+
+```{r, fig.width = 4, fig.height = 5}
+plot_surv_wpval <- function(x) {
+  gene_id <- x
+  median_value <- median(d_mat[,gene_id])
+  
+  gene_name <- dge[[3]] %>% 
+    dplyr::filter(ensembl_gene_id == x) %>%
+    dplyr::select(external_gene_name) %>% deframe
+  
+  d_meta_gene <- d_mat[,gene_id] %>% 
+    as_tibble(rownames = "barcode") %>% 
+    rename(., c("value" = "gene_value")) %>%
+    inner_join(., clin_df, by = "barcode") %>%
+    mutate(gene = ifelse(gene_value <= median_value, "DOWN", "UP"))
+
+  fit <- survfit(Surv(overall_survival, deceased) ~ gene, data=d_meta_gene)
+
+  ggsurvplot(fit, data=d_meta_gene, pval=T, risk.table=T, title=paste(gene_name))
+
+}
+
+map(genes_signif_hiFC, ~ plot_surv_wpval(.x))
+```
+
+Signature of genes that predict survival
+
+```{r}
+final_signature <- dge[[3]] %>% dplyr::filter(ensembl_gene_id %in% genes_signif_hiFC)
+final_signature
+
+```
+
+These genes have known relationships to tumor staging and pathogenesis,
+including the Wnt signalling (ROR2) and TGFbeta (AC100803.3) signalling
+pathways. The signature can be used to estimate patient outcome in renal
+cell carcinoma.
+
+------------------------------------------------------------------------
