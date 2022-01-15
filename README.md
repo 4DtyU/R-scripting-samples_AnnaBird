@@ -38,7 +38,7 @@
 </pre>
 
 
-# Coding Sample_3 - Derivation of a prognostic signature in renal cell carcinoma transcriptomic data (from GDC/TCGA)
+# Coding Sample_3 - Derivation of a prognostic signature using renal cell carcinoma transcriptomic data (from GDC/TCGA)
 
 <pre>
 <font color="3300CC"> PURPOSE OF THE CODE:</font>
