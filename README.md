@@ -53,3 +53,23 @@
 <p>     Step 3) Optional: Input a local directory where you want the GDC files saved (default download uses be "api" method. Files total 156MB).
 <p>     Step 4) Run the .Rmd file using 'knit' OR just look at the included .nb file to view analysis. 
 </pre>
+
+
+
+# Coding Sample_4 - FASTER FACS - Automated processing of FlowJo statistics
+
+<pre>
+<font color="3300CC"> PURPOSE OF THE CODE:</font>
+<p>     Shiny app processes FlowJo stats & experimental metadata using a two-step upload & download.
+<p>     Non-proprietary demo data are included. 
+</pre>
+
+<pre>
+<font color="3300CC"> INSTRUCTIONS FOR USE:</font>
+<p>     Step 1) Download all files (click the green "Code" button above; download .zip folder)
+<p>     Step 2) Extract the zip folder contents
+<p>     Step 3) Install both R & R Studio
+<p>     Step 4) Double click the "app_FASTER FACS.R" file to use the app. 
+</pre>
+
+
