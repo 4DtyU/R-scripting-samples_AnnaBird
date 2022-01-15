@@ -1,6 +1,6 @@
 
 # Instructions:
-# Coding Sample_1 - Shiny Application - Research data cleanup
+# Coding Sample_1 - Shiny App - Automated ELISA data processing
 
 <pre>
 <font color="3300CC"> PURPOSE OF THE SHINY APPLICATION:</font>
