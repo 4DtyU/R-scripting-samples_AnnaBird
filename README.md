@@ -69,7 +69,7 @@
 <p>     Step 1) Download all files (click the green "Code" button above; download .zip folder)
 <p>     Step 2) Extract the zip folder contents
 <p>     Step 3) Install both R & R Studio
-<p>     Step 4) Double click the "app_FASTER FACS.R" file to use the app. 
+<p>     Step 4) Open the "app_FASTER FACS.R" file in R Studio & then click the "Run App" button. The first time the app is run, it will automatically install required R packages. Package installation may take a few minutes, but it will only happen once. 
 </pre>
 
 
