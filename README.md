@@ -69,7 +69,8 @@
 <p>     Step 1) Download all files (click the green "Code" button above; download .zip folder)
 <p>     Step 2) Extract the zip folder contents
 <p>     Step 3) Install both R & R Studio
-<p>     Step 4) Open the "app_FASTER FACS.R" file in R Studio & then click the "Run App" button. 
+<p>     Step 4) Open R Studio and run **install.packages("shiny")** in the console (this only needs to be done once)
+<p>     Step 5) Open the "app_FASTER FACS.R" file in R Studio & then click the "Run App" button. 
 <p>             The first time the app is run, it will automatically install required R packages. 
 <p>             Package installation may take a few minutes, but it will only happen once. 
 </pre>
