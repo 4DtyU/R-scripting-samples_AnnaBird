@@ -16,9 +16,10 @@
 <font color="3300CC"> INSTRUCTIONS FOR USE:</font>
 <p>     Step 1) Download all files (click the green "Code" button above; download .zip folder)
 <p>     Step 2) Extract the zip folder contents 
-<p>     Step 3) Open the Shiny app.
-<p>     Step 4) Use the app to upload the example ELISA data, and review the output plots. 
-<p>     Step 5) Download the cleaned data for experiment-tailored processing/plotting in Tableau/Spotfire. 
+<p>     Step 3) Open R Studio and run <b>install.packages("shiny")</b> in the console
+<p>     Step 4) Open the Shiny app. 
+<p>     Step 5) Use the app to upload the example ELISA data, and review the output plots. 
+<p>     Step 6) Download the cleaned data for experiment-tailored processing/plotting in Tableau/Spotfire. 
 </pre>
 
 # Coding Sample_2 - FACS Analysis & Discussion
