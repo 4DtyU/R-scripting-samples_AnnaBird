@@ -18,6 +18,8 @@
 <p>     Step 4) Open the Shiny app. 
 <p>     Step 5) Use the app to upload the example ELISA data, and review the output plots. 
 <p>     Step 6) Download the cleaned data for experiment-tailored processing/plotting in Tableau/Spotfire. 
+<p>
+<p>
 </pre>
 
 ### [2 of 4] Coding Sample_2 - FACS Analysis & Discussion
@@ -32,6 +34,8 @@
 <p>     Step 2) Extract the zip folder contents
 <p>     Step 3) Run the .Rmd file
 <p>     Step 4) Use the "Preview" button in R Studio to view the html report output
+<p>
+<p>
 </pre>
 
 
@@ -48,6 +52,8 @@
 <p>     Step 2) Extract the zip folder contents
 <p>     Step 3) Optional: Input a local directory where you want the GDC files saved (default download uses be "api" method. Files total 156MB).
 <p>     Step 4) Run the .Rmd file using 'knit' OR just look at the included .nb file to view analysis. 
+<p>
+<p>
 </pre>
 
 
@@ -69,6 +75,8 @@
 <p>     Step 5) Open the "app_FASTER FACS.R" file in R Studio & then click the "Run App" button. 
 <p>             The first time the app is run, it will automatically install required R packages. 
 <p>             Package installation may take a few minutes, but it will only happen once. Follow the instructions in the app.
+<p>
+<p>
 </pre>
 
 
