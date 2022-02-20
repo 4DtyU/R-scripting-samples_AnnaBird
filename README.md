@@ -62,7 +62,8 @@
 <pre>
 <font color="3300CC"> PURPOSE OF THE CODE:</font>
 <p>     Shiny app combines FlowJo-exported stats & experimental metadata and outputs plot-ready tables. 
-<p>     User can upload raw FACS stats & download processed data ready for GraphpadPrism or Tableau (or Spotfire), thereby automating appx. twenty-five data processing steps. 
+<p>     User can upload raw FACS stats & download processed data ready for GraphpadPrism or Tableau (or Spotfire), 
+<p>     thereby automating appx. twenty-five data processing steps. 
 <p>     Non-proprietary demo data are included. 
 </pre>
 
