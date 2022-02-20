@@ -1,6 +1,6 @@
 
-# Instructions:
-# Coding Sample_1 - Shiny App - Automated ELISA data processing
+# Instructions the four scripts:
+### [1 of 4] Coding Sample_1 - Automated ELISA data processing
 
 <pre>
 <font color="3300CC"> PURPOSE OF THE SHINY APPLICATION:</font>
@@ -22,7 +22,7 @@
 <p>     Step 6) Download the cleaned data for experiment-tailored processing/plotting in Tableau/Spotfire. 
 </pre>
 
-# Coding Sample_2 - FACS Analysis & Discussion
+### [2 of 4] Coding Sample_2 - FACS Analysis & Discussion
 
 <pre>
 <font color="3300CC"> PURPOSE OF THE CODE:</font>
@@ -39,10 +39,11 @@
 </pre>
 
 
-# Coding Sample_3 - Derivation of a prognostic signature using renal cell carcinoma transcriptomic data (from GDC/TCGA)
+### [3 of 4] Coding Sample_3 - Derivation of a prognostic signature KIRC
 
 <pre>
 <font color="3300CC"> PURPOSE OF THE CODE:</font>
+<p>     This script derives a prognostic signature for renal cell carcinoma using transcriptomic data (from GDC/TCGA)
 <p>     Analysis provides an example of of data exploration, differential expression analysis (Voom/Limma),
 <p>     and survival analysis ( taken from the GDC public database )
 </pre>
@@ -57,7 +58,7 @@
 
 
 
-# Coding Sample_4 - FASTER FACS - Automated processing of FlowJo statistics
+### [4 of 4] Coding Sample_4 - FASTER FACS - Automated processing of FlowJo statistics
 
 <pre>
 <font color="3300CC"> PURPOSE OF THE CODE:</font>
