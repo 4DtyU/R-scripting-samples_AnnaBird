@@ -26,9 +26,7 @@
 #### PURPOSE OF THE CODE:
 <p>     Example of R analysis using FACS data ( non-proprietary source data ), 
 <p>     including munging, plotting, and analysis narrative.
-</pre>
-
-<pre>
+<p>
 #### INSTRUCTIONS FOR USE:
 <p>     Step 1) Download all files (click the green "Code" button above; download .zip folder)
 <p>     Step 2) Extract the zip folder contents
@@ -44,9 +42,7 @@
 <p>     This script derives a prognostic signature for renal cell carcinoma using transcriptomic data (from GDC/TCGA)
 <p>     Analysis provides an example of of data exploration, differential expression analysis (Voom/Limma),
 <p>     and survival analysis ( taken from the GDC public database )
-</pre>
-
-<pre>
+<p>
 #### INSTRUCTIONS FOR USE:
 <p>     Step 1) Download all files (click the green "Code" button above; download .zip folder)
 <p>     Step 2) Extract the zip folder contents
@@ -64,9 +60,7 @@
 <p>     User can upload raw FACS stats & download processed data ready for GraphpadPrism or Tableau (or Spotfire), 
 <p>     thereby automating appx. twenty-five data processing steps. 
 <p>     Non-proprietary demo data are included. 
-</pre>
-
-<pre>
+<p>
 #### INSTRUCTIONS FOR USE:
 <p>     Step 1) Download all files (click the green "Code" button above; download .zip folder)
 <p>     Step 2) Extract the zip folder contents
