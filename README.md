@@ -1,5 +1,5 @@
 
-# Instructions the four scripts:
+# Instructions:
 ### [1 of 4] Coding Sample_1 - Automated ELISA data processing
 
 <pre>
