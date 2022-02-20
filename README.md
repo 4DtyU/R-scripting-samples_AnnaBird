@@ -3,7 +3,7 @@
 ### [1 of 4] Coding Sample_1 - Automated ELISA data processing
 
 <pre>
-<font color="3300CC"> PURPOSE OF THE SHINY APPLICATION:</font>
+#### PURPOSE OF THE SHINY APPLICATION:
 <p>     Example of Shiny app automating research (ELISA) data munging ( non-proprietary source data ).
 <p>     Purpose: This app automates processing of common immunology research data (ELISA reader output).
 <p>       App saves time for research scientists, who no longer have do manually clean up
@@ -13,7 +13,7 @@
 </pre>
 
 <pre>
-<font color="3300CC"> INSTRUCTIONS FOR USE:</font>
+#### INSTRUCTIONS FOR USE:
 <p>     Step 1) Download all files (click the green "Code" button above; download .zip folder)
 <p>     Step 2) Extract the zip folder contents 
 <p>     Step 3) Open R Studio and run <b>install.packages("shiny")</b> in the console
@@ -25,13 +25,13 @@
 ### [2 of 4] Coding Sample_2 - FACS Analysis & Discussion
 
 <pre>
-<font color="3300CC"> PURPOSE OF THE CODE:</font>
+#### PURPOSE OF THE CODE:
 <p>     Example of R analysis using FACS data ( non-proprietary source data ), 
 <p>     including munging, plotting, and analysis narrative.
 </pre>
 
 <pre>
-<font color="3300CC"> INSTRUCTIONS FOR USE:</font>
+#### INSTRUCTIONS FOR USE:
 <p>     Step 1) Download all files (click the green "Code" button above; download .zip folder)
 <p>     Step 2) Extract the zip folder contents
 <p>     Step 3) Run the .Rmd file
@@ -42,14 +42,14 @@
 ### [3 of 4] Coding Sample_3 - Derivation of a prognostic signature KIRC
 
 <pre>
-<font color="3300CC"> PURPOSE OF THE CODE:</font>
+#### PURPOSE OF THE CODE:
 <p>     This script derives a prognostic signature for renal cell carcinoma using transcriptomic data (from GDC/TCGA)
 <p>     Analysis provides an example of of data exploration, differential expression analysis (Voom/Limma),
 <p>     and survival analysis ( taken from the GDC public database )
 </pre>
 
 <pre>
-<font color="3300CC"> INSTRUCTIONS FOR USE:</font>
+#### INSTRUCTIONS FOR USE:
 <p>     Step 1) Download all files (click the green "Code" button above; download .zip folder)
 <p>     Step 2) Extract the zip folder contents
 <p>     Step 3) Optional: Input a local directory where you want the GDC files saved (default download uses be "api" method. Files total 156MB).
@@ -61,7 +61,7 @@
 ### [4 of 4] Coding Sample_4 - FASTER FACS - Automated processing of FlowJo statistics
 
 <pre>
-<font color="3300CC"> PURPOSE OF THE CODE:</font>
+#### PURPOSE OF THE CODE:
 <p>     Shiny app combines FlowJo-exported stats & experimental metadata and outputs plot-ready tables. 
 <p>     User can upload raw FACS stats & download processed data ready for GraphpadPrism or Tableau (or Spotfire), 
 <p>     thereby automating appx. twenty-five data processing steps. 
@@ -69,7 +69,7 @@
 </pre>
 
 <pre>
-<font color="3300CC"> INSTRUCTIONS FOR USE:</font>
+#### INSTRUCTIONS FOR USE:
 <p>     Step 1) Download all files (click the green "Code" button above; download .zip folder)
 <p>     Step 2) Extract the zip folder contents
 <p>     Step 3) Install both R & R Studio
