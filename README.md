@@ -61,7 +61,8 @@
 
 <pre>
 <font color="3300CC"> PURPOSE OF THE CODE:</font>
-<p>     Shiny app processes FlowJo stats & experimental metadata using a two-step upload & download.
+<p>     Shiny app combines FlowJo-exported stats & experimental metadata and outputs plot-ready tables. 
+<p>     User can upload raw FACS stats & download processed data ready for GraphpadPrism or Tableau (or Spotfire), thereby automating appx. twenty-five data processing steps. 
 <p>     Non-proprietary demo data are included. 
 </pre>
 
@@ -73,7 +74,7 @@
 <p>     Step 4) Open R Studio and run <b>install.packages("shiny")</b> in the console (this only needs to be done once)
 <p>     Step 5) Open the "app_FASTER FACS.R" file in R Studio & then click the "Run App" button. 
 <p>             The first time the app is run, it will automatically install required R packages. 
-<p>             Package installation may take a few minutes, but it will only happen once. 
+<p>             Package installation may take a few minutes, but it will only happen once. Follow the instructions in the app.
 </pre>
 
 
