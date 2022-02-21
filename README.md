@@ -5,11 +5,10 @@
 <pre>
 #### PURPOSE OF THE SHINY APPLICATION:
 <p>     Example of Shiny app automating research (ELISA) data munging ( non-proprietary source data ).
-<p>     Purpose: This app automates processing of common immunology research data (ELISA reader output).
-<p>       App saves time for research scientists, who no longer have do manually clean up
-<p>       their data through error prone copying & pasting. Cleaned data can be downloaded in 
-<p>       'tidy' format, i.e. suitable for Tableau or SQL database. Data are also plotted for 
-<p>       quick review and QC of the data. 
+<p>     Purpose: This app automates processing of common immunology research data (ELISA reader output),
+<p>     making such processing faster & less error prone. Cleaned data can be downloaded in 
+<p>     'tidy' format, i.e. suitable for Tableau or SQL database. Data are also plotted for 
+<p>     quick review and QC of the data. 
 <p>
 #### INSTRUCTIONS FOR USE:
 <p>     Step 1) Download all files (click the green "Code" button above; download .zip folder)
