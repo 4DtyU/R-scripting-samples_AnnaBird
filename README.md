@@ -10,7 +10,7 @@
 <p>     'tidy' format, i.e. suitable for Tableau or SQL database. Data are also plotted for 
 <p>     quick review and QC of the data. 
 <p>
-#### INSTRUCTIONS FOR USE:
+#### HOW DO I USE THIS APP?:
 <p>     Step 1) Download all files (click the green "Code" button above; download .zip folder)
 <p>     Step 2) Extract the zip folder contents 
 <p>     Step 3) Open R Studio and run <b>install.packages("shiny")</b> in the console
@@ -46,7 +46,7 @@
 <p>     Analysis provides an example of of data exploration, differential expression analysis (Voom/Limma),
 <p>     and survival analysis ( taken from the GDC public database )
 <p>
-#### INSTRUCTIONS FOR USE:
+#### How can I run and/or view the analysis?:
 <p>     Step 1) Download all files (click the green "Code" button above; download .zip folder)
 <p>     Step 2) Extract the zip folder contents
 <p>     Step 3) Optional: Input a local directory where you want the GDC files saved 
@@ -61,13 +61,13 @@
 
 <pre>
 #### PURPOSE OF THE CODE:
-<p>     Shiny app combines FlowJo-exported stats & experimental metadata and outputs plot-ready tables. 
-<p>     User can upload raw FACS stats & download processed data ready for GraphpadPrism or Tableau (or Spotfire), 
-<p>     thereby automating appx. twenty-five data processing steps. 
-<p>     Non-proprietary demo data are included. 
+<p>     Speed up your flow cytometry analysis with the FASTER FACS Shiny App. 
+<p>     FASTER FACS lets you upload your raw data & download processed data ready for 
+<p>     GraphpadPrism, Tableau, or other BI software.  
+<p>     This app automates appx. Twenty-five data processing steps. 
 <p>
-#### INSTRUCTIONS FOR USE:
-<p>     Step 1) Download all files (click the green "Code" button above; download .zip folder)
+#### HOW DO I USE THIS APP?:
+<p>     Step 1) Download app (click the green "Code" button above; download .zip folder)
 <p>     Step 2) Extract the zip folder contents
 <p>     Step 3) Install both R & R Studio
 <p>     Step 4) Open R Studio and run <b>install.packages("shiny")</b> in the console (this only needs to be done once)
