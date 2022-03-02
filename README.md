@@ -60,7 +60,7 @@
 ### [4 of 4] Coding Sample_4 - FASTER FACS - Automated processing of FlowJo statistics
 
 <pre>
-#### PURPOSE OF THE CODE:
+#### PURPOSE OF THE SHINY APP:
 <p>     Speed up your flow cytometry analysis with the FASTER FACS Shiny App. 
 <p>     FASTER FACS lets you upload your raw data & download processed data ready for 
 <p>     GraphpadPrism, Tableau, or other BI software.  
