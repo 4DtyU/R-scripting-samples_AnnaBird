@@ -158,11 +158,11 @@ server <- function(input, output) {
       flowjo_file <- input$flowjo_file
     if(is.null(flowjo_file)) {   
       return()
-    } else if (str_detect(flowjo_file, ".xlsx$")) {
+    } else if (any(str_detect(flowjo_file, ".xlsx$"))) {
       df <- read_excel(flowjo_file$datapath) 
-    } else if (str_detect(flowjo_file, ".csv$")) {
+    } else if (any(str_detect(flowjo_file, ".csv$"))) {
       df <- read_csv(flowjo_file$datapath)   
-    } else if (str_detect(flowjo_file, ".txt$")) {
+    } else if (any(str_detect(flowjo_file, ".txt$"))) {
       df <- read_tsv(flowjo_file$datapath)  
     } else { return()
     } 
@@ -202,7 +202,7 @@ server <- function(input, output) {
       
       if(is.null(metadata_file)) {    
         return()
-      } else if (str_detect(metadata_file, ".xlsx$")) {
+      } else if (any(str_detect(metadata_file, ".xlsx$"))) {
                 
                 if (length(readxl::excel_sheets(metadata_file$datapath)) > 1) {
                   d.meta <- read_excel(metadata_file$datapath, sheet = "metadata")
@@ -212,9 +212,9 @@ server <- function(input, output) {
                   return()
                   }
           
-      } else if (str_detect(metadata_file, ".csv$")) {
+      } else if (any(str_detect(metadata_file, ".csv$"))) {
         d.meta <- read_csv(metadata_file$datapath)   
-      } else if (str_detect(metadata_file, ".txt$")) {
+      } else if (any(str_detect(metadata_file, ".txt$"))) {
         d.meta <- read_tsv(metadata_file$datapath)  
       } 
       
