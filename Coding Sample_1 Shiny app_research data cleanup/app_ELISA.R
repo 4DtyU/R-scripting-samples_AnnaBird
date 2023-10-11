@@ -60,7 +60,7 @@ ui <- fluidPage(
         )
     )
 )
-
+df <- read_excel("Sample_ELISA_data.xlsx")
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
@@ -69,11 +69,11 @@ server <- function(input, output) {
     if(is.null(file1)) {
       return()
     } else { 
-                if (str_detect(file1, ".xlsx$")) {
+                if (any(str_detect(file1, ".xlsx$"))) {
                 df <- read_excel(file1$datapath) 
-              } else if (str_detect(file1, ".csv$")) {
+              } else if (any(str_detect(file1, ".csv$"))) {
                 df <- read_csv(file1$datapath)   
-              } else if (str_detect(file1, ".txt$")) {
+              } else if (any(str_detect(file1, ".txt$"))) {
                 df <- read_tsv(file1$datapath)  
               } 
       
@@ -116,11 +116,11 @@ server <- function(input, output) {
       geom_text(aes(label = ifelse(CV > 20, Condition_ID, "")),
                 hjust = 1.2,
                 vjust = 0.5) +
-      labs(title = "Note assay conditions with high CV", 
+      labs(title = "Note assay conditions with high CV",
            subtitle = "Point tags indicate \'Condition_ID\'. Points with \nthe same Condition_ID are replicates.",
            x = "coef. of var.") +
       scale_x_continuous(labels = percent_format())
-    
+
     p.2 <- ggplot(data = data()) +
       geom_point(size = 2.5, alpha = 0.7, shape = 21, color = "black",
                  mapping = aes(x = OD, y = Conc, fill=factor(Dilution))) +
@@ -133,10 +133,10 @@ server <- function(input, output) {
            y = "log10 conc \n(unadjusted for dilution factor)",
            fill = "Dilution\nfactor") +
       scale_fill_viridis_d()
-    
+
     p.1 + p.2
 
-    
+
     })
 
     
